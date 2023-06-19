@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Blog from './pages/Blog';
 import Gallery from './pages/Gallery';
+import Upload from './pages/Upload';
 import './App.css';
 
 const App = () => {
@@ -15,6 +16,7 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/gallery" element={<Gallery />} />
+        <Route path="/upload" element={<Upload />} />
         // add more routes as needed
       </Routes>
     </Router>
