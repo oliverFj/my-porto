@@ -23,7 +23,7 @@ function UploadForm({ fields, databasePath }) {
   const [values, setValues] = useState(initialFieldValues);
   const [image, setImage] = useState(null);
 
-  const ART_TYPES = ["3d characters", "Product design", "Art"];
+  const ART_TYPES = ["3d Character", "Product design", "Art"];
   const WRITING_TYPES = ["Blog", "Poems", "Essays"];
 
   useEffect(() => {
@@ -75,14 +75,25 @@ function UploadForm({ fields, databasePath }) {
       }
       return obj;
     }, {});
-
+  
     if (imageUrl) {
       filteredValues.imageThumbnail = imageUrl;
     }
-
-    push(ref(db, databasePath), filteredValues);
-    setImage(null);
-    setValues(initialFieldValues);
+  
+    if (databasePath.includes('Art')) {
+      filteredValues.type = values.type || ART_TYPES[0];
+    } else {
+      filteredValues.type = values.type || WRITING_TYPES[0];
+    }
+  
+    push(ref(db, databasePath), filteredValues)
+      .then(() => {
+        setImage(null);
+        setValues(initialFieldValues);
+      })
+      .catch((error) => {
+        console.error("Error uploading data:", error);
+      });
   };
 
   return (

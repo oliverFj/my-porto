@@ -1,12 +1,12 @@
 import React from 'react';
 
-const Card = ({card}) => (
-  <div className="flex flex-col items-center bg-white  overflow-hidden w-48">
-
-    <img className="object-cover w-full h-full border-2 border-black" src={card.imageThumbnail} alt={card.name}></img>
-
-    <h2 className="text-gray-900 font-bold text-1xl">{card.name}</h2>
-  </div>
-);
+const Card = ({ imageThumbnail, name }) => {
+  return (
+    <div className="card bg-white">
+      <img src={imageThumbnail} alt={name} className="card-image border-2 border-black" />
+      <div className="card-name text-left font-bold">{name}</div>
+    </div>
+  );
+};
 
 export default Card;
