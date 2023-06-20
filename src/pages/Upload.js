@@ -1,7 +1,17 @@
+/**
+ * Upload component
+ * This is a page component that includes the UploadForm for different types of uploads.
+ * 
+ * You need to change:
+ * - `ART_FIELDS` and `WRITING_FIELDS`: These arrays define the fields for two different types of uploads. Modify these arrays to suit the fields required for your use case. 
+ * - `menuItems`: This array defines the different types of uploads available. Update the 'label', 'path', and 'fields' for each item to match your use case.
+ * - `Layout` import: You need to import your layout component from where it is defined in your project.
+ * - `UploadForm` import: You need to import the UploadForm component from where it is defined in your project.
+ */
 // pages/Upload.js
 import React, { useState, useEffect } from 'react';
-import Layout from '../layout';
-import UploadForm from '../components/uploadForm';
+import Layout from '../layout'; // <- Import your layout component from where it's defined
+import UploadForm from '../components/uploadForm'; // <- Import your UploadForm component from where it's defined
 
 const Upload = () => {
   const ART_FIELDS = [

@@ -1,12 +1,34 @@
-import React, { useState } from 'react';
+/**
+ * UploadForm component
+ * This is a form component that handles data upload to a Firebase database and storage.
+ * 
+ * @param {Object} props
+ * @param {Array} props.fields - An array of objects representing the fields in the form. Each object should have a 'name' and 'type'.
+ * @param {String} props.databasePath - A string representing the path in the Firebase database where the data will be saved.
+ *
+ * You need to change:
+ * - `fields`: Update this to reflect the fields your form should contain. Each field object should have a 'name' and 'type'.
+ * - `databasePath`: This should point to the location in your Firebase database where you want to store the form data.
+ * - `app` import: You need to import your Firebase app configuration from where it is defined in your project.
+ *
+ * Firebase configuration for both database and storage should be properly set up in your Firebase console.
+ */
+import React, { useState, useEffect } from 'react';
 import { getDatabase, ref, push } from "firebase/database";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { app } from '../firebase';
+import { app } from '../firebase'; // <- Import your Firebase app from where it's configured
 
 function UploadForm({ fields, databasePath }) {
   const initialFieldValues = fields.reduce((obj, item) => ({ ...obj, [item.name]: '' }), {});
   const [values, setValues] = useState(initialFieldValues);
   const [image, setImage] = useState(null);
+
+  const ART_TYPES = ["3d characters", "Product design", "Art"];
+  const WRITING_TYPES = ["Blog", "Poems", "Essays"];
+
+  useEffect(() => {
+    setValues(fields.reduce((obj, item) => ({ ...obj, [item.name]: '' }), {}));
+  }, [fields]);
 
   const handleChange = (e) => {
     if (e.target.name === 'imageThumbnail') {
@@ -18,6 +40,7 @@ function UploadForm({ fields, databasePath }) {
       });
     }
   };
+
 
   const uploadImage = async () => {
     if (!image) return null;
@@ -69,6 +92,12 @@ function UploadForm({ fields, databasePath }) {
           <label htmlFor={field.name} className="w-14 text-right mr-4">{field.name}</label>
           {field.name === 'imageThumbnail' ? (
             <input id={field.name} name={field.name} type="file" onChange={handleChange} className="w-3/4 border rounded px-2" />
+          ) : field.name === 'type' ? (
+            <select id={field.name} name={field.name} value={values[field.name]} onChange={handleChange} className="w-3/4 border rounded px-2">
+              {(databasePath === 'Art' ? ART_TYPES : WRITING_TYPES).map((type, index) => (
+                <option key={index} value={type}>{type}</option>
+              ))}
+            </select>
           ) : (
             <input id={field.name} name={field.name} type={field.type} value={values[field.name]} onChange={handleChange} className="w-3/4 border rounded px-2" />
           )}
