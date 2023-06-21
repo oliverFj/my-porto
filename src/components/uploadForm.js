@@ -1,18 +1,64 @@
 /**
- * UploadForm component
- * This is a form component that handles data upload to a Firebase database and storage.
- * 
- * @param {Object} props
- * @param {Array} props.fields - An array of objects representing the fields in the form. Each object should have a 'name' and 'type'.
- * @param {String} props.databasePath - A string representing the path in the Firebase database where the data will be saved.
- *
- * You need to change:
- * - `fields`: Update this to reflect the fields your form should contain. Each field object should have a 'name' and 'type'.
- * - `databasePath`: This should point to the location in your Firebase database where you want to store the form data.
- * - `app` import: You need to import your Firebase app configuration from where it is defined in your project.
- *
- * Firebase configuration for both database and storage should be properly set up in your Firebase console.
- */
+Komponenten UploadForm
+
+Dette er en formular-komponent, der håndterer upload af data til en Firebase-database og -lagring.
+Denne komponent er designet til at blive brugt i en React-app, der er konfigureret med Firebase.
+
+@param {Object} props
+@param {Array} props.fields - Et array af objekter, der repræsenterer felterne i formularen. Hvert objekt skal have et 'name' og 'type'.
+@param {String} props.databasePath - En streng, der repræsenterer stien i Firebase-databasen, hvor dataene vil blive gemt.
+
+Du skal ændre:
+
+fields: Opdater dette for at afspejle de felter, din formular skal indeholde. Hvert feltsobjekt skal have et 'name' og 'type'.
+databasePath: Dette skal pege på placeringen i din Firebase-database, hvor du vil gemme formulardataene.
+
+Import af app: Du skal importere konfigurationen for din Firebase-app fra det sted, hvor den er defineret i dit projekt.
+Firebase-konfigurationen for både database og lagring skal være korrekt opsat i din Firebase-konsol.
+
+
+------------------
+Denne kode definerer en React-komponent kaldet UploadForm, der håndterer upload af data til en Firebase-database og -lagring.
+
+Komponenten modtager to props: fields og databasePath. fields er et array af objekter, der repræsenterer felterne i formularen, og databasePath er stien i Firebase-databasen, hvor dataene vil blive gemt.
+
+fields og databasePath skal tilpasses i forhold til de specifikke felter og sti i den aktuelle Firebase-konfiguration.
+
+Firebase-appen skal importeres fra det relevante sted i projektet og tildeles variablen app. Dette sikrer, at den korrekte Firebase-konfiguration bruges.
+
+Komponenten bruger React Hooks som useState og useEffect til at håndtere formularværdier og livscyklushændelser.
+
+handleChange-funktionen opdaterer værdierne baseret på brugerens input. Hvis input er en billedfil, gemmes filen separat i image-tilstanden.
+
+uploadImage-funktionen håndterer upload af billedet til Firebase Storage og returnerer en Promise, der resulterer i billedets download-URL.
+
+handleSubmit-funktionen håndterer indsendelsen af formularen. Den uploader først billedet ved hjælp af uploadImage-funktionen og opdaterer derefter formularværdierne og den filtrerede værdi, der skal gemmes i Firebase-databasen. Til sidst nulstilles formularværdierne.
+
+Komponenten genererer HTML-formularelementer baseret på fields-prop. Det støtter inputfelter, filindtastning og dropdown-menuer afhængigt af felterne i fields.
+
+Når formularen indsendes, kaldes handleSubmit-funktionen, og dataene sendes til Firebase-databasen ved hjælp af push-metoden fra Firebase Realtime Database SDK.
+------------------
+
+De to vigtigste ting ved denne fil er:
+
+Dataupload til Firebase: Filen indeholder implementeringen af en formularkomponent, 
+der håndterer upload af data til en Firebase-database og -lagring. 
+Dette er en afgørende funktionalitet for applikationer, der ønsker at gemme 
+brugerindtastede data i en Firebase-database og håndtere upload af billeder 
+eller andre filer til Firebase Storage.
+
+Med andre ord: upload af data til Firebase-databasen og -lagringen.
+
+Firebase-konfiguration: Filen kræver, at Firebase-appens konfiguration importeres
+fra et andet sted i projektet og tildeles variablen app. Dette sikrer, at den 
+korrekte Firebase-konfiguration bruges til at oprette forbindelse til Firebase-databasen
+og -lagringen. En korrekt konfiguration af Firebase er afgørende for at kunne foretage
+dataupload og -lagring korrekt.
+
+Med andre ord: Firebase-konfigurationen skal være korrekt opsat i din Firebase-konsol.
+
+*/
+
 import React, { useState, useEffect } from 'react';
 import { getDatabase, ref, push } from "firebase/database";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "firebase/storage";

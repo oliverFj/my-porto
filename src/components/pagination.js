@@ -16,8 +16,8 @@ const Pagination = ({ activePage, itemsCountPerPage, totalItemsCount, onChange }
     for (let i = 1; i <= totalPages; i++) {
       const isActive = i === activePage;
       const buttonClasses = isActive
-        ? 'text-black px-4 py-2 border-2 border-black'
-        : 'bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-2 ';
+        ? 'text-black px-4 border-l-2 border-black'
+        : 'bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 border-l-2 border-black px-4';
 
       pageButtons.push(
         <button
@@ -37,7 +37,7 @@ const Pagination = ({ activePage, itemsCountPerPage, totalItemsCount, onChange }
     if (activePage > 1) {
       return (
         <button
-          className="bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-2"
+          className="bg-gray-200 text-gray-700  hover:bg-gray-300 border-l-2 border-black px-4 "
           onClick={() => handlePageChange(activePage - 1)}
         >
           Previous
@@ -51,7 +51,7 @@ const Pagination = ({ activePage, itemsCountPerPage, totalItemsCount, onChange }
     if (activePage < totalPages) {
       return (
         <button
-          className="bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-2 "
+          className="bg-gray-200 text-gray-700 hover:bg-gray-300 border-l-2 border-black px-4  "
           onClick={() => handlePageChange(activePage + 1)}
         >
           Next
@@ -62,7 +62,7 @@ const Pagination = ({ activePage, itemsCountPerPage, totalItemsCount, onChange }
   };
 
   return (
-    <div className="flex justify-center mt-4">
+    <div className="flex justify-center">
       {renderPrevButton()}
       {renderPageButtons()}
       {renderNextButton()}

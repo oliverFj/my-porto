@@ -9,9 +9,12 @@
  * - `UploadForm` import: You need to import the UploadForm component from where it is defined in your project.
  */
 // pages/Upload.js
+
+//Skriv nogle pædagogiske kommentarer til denne kode:
+
 import React, { useState, useEffect } from 'react';
-import Layout from '../layout'; // <- Import your layout component from where it's defined
-import UploadForm from '../components/uploadForm'; // <- Import your UploadForm component from where it's defined
+import Layout from '../layout'; 
+import UploadForm from '../components/uploadForm'; 
 
 const Upload = () => {
   const ART_FIELDS = [

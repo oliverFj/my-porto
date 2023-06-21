@@ -15,7 +15,7 @@ const GalleryGrid = ({
   const gridItems = items
   .slice(startIndex, endIndex)
   .map(({ id, imageThumbnail, name }) => (
-    <Card key={id} imageThumbnail={imageThumbnail} name={name} />
+    <Card key={id} id={id} imageThumbnail={imageThumbnail} name={name} />
   ));
 
 // Filter gridItems based on the selected tab
@@ -38,17 +38,21 @@ const filteredGridItems =
   };
 
   return (
-    <div>
-      <div className="gallery-grid">{gridRows}</div>
-      <div className="flex justify-center mt-4">
-        <Pagination
-          activePage={activePage}
-          itemsCountPerPage={itemsCountPerPage}
-          totalItemsCount={totalItemsCount}
-          onChange={handlePageChange}
-        />
-      </div>
+<div>
+  <div className="flex justify-between items-center h-12 border-b-2 border-black">
+    <h1 className="text-black text-xl text-left font-bold px-2 ">{activeTab}</h1>
+    <div className="flex justify-between h-12">
+      <Pagination
+        activePage={activePage}
+        itemsCountPerPage={itemsCountPerPage}
+        totalItemsCount={totalItemsCount}
+        onChange={handlePageChange}
+      />
     </div>
+  </div>
+
+  <div className="gallery-grid">{gridRows}</div>
+</div>
   );
 };
 

@@ -6,6 +6,8 @@ import About from './pages/About';
 import Blog from './pages/Blog';
 import Gallery from './pages/Gallery';
 import Upload from './pages/Upload';
+import ItemPage from './pages/ItemPage';
+import NotFound from './pages/NotFound';
 import './App.css';
 
 const App = () => {
@@ -17,6 +19,8 @@ const App = () => {
         <Route path="/blog" element={<Blog />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/upload" element={<Upload />} />
+        <Route path="/item/:id" element={<ItemPage />} />
+        <Route path="*" element={<NotFound />} />
         // add more routes as needed
       </Routes>
     </Router>
