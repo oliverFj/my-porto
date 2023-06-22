@@ -1,5 +1,5 @@
+// GalleryGrid.js
 import React from 'react';
-import Card from './galleryCard';
 import Pagination from './pagination';
 
 const GalleryGrid = ({
@@ -9,20 +9,14 @@ const GalleryGrid = ({
   totalItemsCount,
   activeTab,
   onPageChange,
+  CardComponent,
 }) => {
   const startIndex = (activePage - 1) * itemsCountPerPage;
   const endIndex = startIndex + itemsCountPerPage;
-  const gridItems = items
-  .slice(startIndex, endIndex)
-  .map(({ id, imageThumbnail, name }) => (
-    <Card key={id} id={id} imageThumbnail={imageThumbnail} name={name} />
-  ));
 
-// Filter gridItems based on the selected tab
-const filteredGridItems =
-  activeTab === 'All'
-    ? gridItems
-    : gridItems.filter((item) => item.props.type === activeTab);
+ const gridItems = items
+    .slice(startIndex, endIndex)
+    .map((item) => <CardComponent key={item.id} {...item} />);
 
   const gridRows = [];
   for (let i = 0; i < gridItems.length; i += 3) {
@@ -38,21 +32,21 @@ const filteredGridItems =
   };
 
   return (
-<div>
-  <div className="flex justify-between items-center h-12 border-b-2 border-black">
-    <h1 className="text-black text-xl text-left font-bold px-2 ">{activeTab}</h1>
-    <div className="flex justify-between h-12">
-      <Pagination
-        activePage={activePage}
-        itemsCountPerPage={itemsCountPerPage}
-        totalItemsCount={totalItemsCount}
-        onChange={handlePageChange}
-      />
-    </div>
-  </div>
+    <div>
+      <div className="flex justify-between items-center h-12 border-b-2 border-black">
+        <h1 className="text-black text-xl text-left font-bold px-2 ">{activeTab}</h1>
+        <div className="flex justify-between h-12">
+          <Pagination
+            activePage={activePage}
+            itemsCountPerPage={itemsCountPerPage}
+            totalItemsCount={totalItemsCount}
+            onChange={handlePageChange}
+          />
+        </div>
+      </div>
 
-  <div className="gallery-grid">{gridRows}</div>
-</div>
+      <div className="gallery-grid">{gridRows}</div>
+    </div>
   );
 };
 
