@@ -100,6 +100,7 @@ function UploadForm({ fields, databasePath }) {
     const editorHeight = editor.root.offsetHeight;
     const container = quillRef.current.container.parentNode;
     container.style.height = `${editorHeight}px`;
+
   };
 
   const uploadImage = async () => {
@@ -164,7 +165,7 @@ function UploadForm({ fields, databasePath }) {
     <form onSubmit={handleSubmit} className="flex flex-col space-y-2 p-4">
       {fields.map((field, index) => (
         <div key={index} className="flex flex-col"> {/* Wrap each field in a flex column */}
-          <label htmlFor={field.name} className="w-14 text-right mr-4">{field.name}</label>
+          <label htmlFor={field.name} className="w-14 text-left mr-4">{field.name}</label>
           {field.name === 'imageThumbnail' ? (
             <input id={field.name} name={field.name} type="file" onChange={handleChange} className="w-3/4 border rounded px-2" />
           ) : field.name === 'type' ? (
@@ -174,7 +175,7 @@ function UploadForm({ fields, databasePath }) {
               ))}
             </select>
           ) : field.name === 'text' ? (
-            <div className="w-3/4 border rounded px-2" style={{ minHeight: '100px', height: 'auto' }}>
+            <div className="w-3/4 border rounded px-2" style={{  height: 'auto' }}>
               <ReactQuill ref={quillRef} value={text} onChange={handleTextChange} onResize={handleQuillResize} />
             </div>
           ) : (
