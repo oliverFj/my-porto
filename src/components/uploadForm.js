@@ -59,7 +59,9 @@ Med andre ord: Firebase-konfigurationen skal være korrekt opsat i din Firebase-
 
 */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import { getDatabase, ref, push } from "firebase/database";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { app } from '../firebase'; // <- Import your Firebase app from where it's configured
@@ -68,6 +70,8 @@ function UploadForm({ fields, databasePath }) {
   const initialFieldValues = fields.reduce((obj, item) => ({ ...obj, [item.name]: '' }), {});
   const [values, setValues] = useState(initialFieldValues);
   const [image, setImage] = useState(null);
+  const [text, setText] = useState('');
+  const quillRef = useRef(null);
 
   const ART_TYPES = ["3d Character", "Product design", "Art"];
   const WRITING_TYPES = ["Blog", "Poems", "Essays"];
@@ -87,6 +91,16 @@ function UploadForm({ fields, databasePath }) {
     }
   };
 
+  const handleTextChange = (value) => {
+    setText(value);
+  };
+
+  const handleQuillResize = () => {
+    const editor = quillRef.current.getEditor();
+    const editorHeight = editor.root.offsetHeight;
+    const container = quillRef.current.container.parentNode;
+    container.style.height = `${editorHeight}px`;
+  };
 
   const uploadImage = async () => {
     if (!image) return null;
@@ -95,7 +109,8 @@ function UploadForm({ fields, databasePath }) {
     const uploadTask = uploadBytesResumable(storageReference, image);
 
     return new Promise((resolve, reject) => {
-      uploadTask.on('state_changed',
+      uploadTask.on(
+        'state_changed',
         (snapshot) => {
           // You can add code here to handle the progress of the upload if you like
         },
@@ -121,21 +136,24 @@ function UploadForm({ fields, databasePath }) {
       }
       return obj;
     }, {});
-  
+
     if (imageUrl) {
       filteredValues.imageThumbnail = imageUrl;
     }
-  
+
     if (databasePath.includes('Art')) {
       filteredValues.type = values.type || ART_TYPES[0];
     } else {
       filteredValues.type = values.type || WRITING_TYPES[0];
     }
-  
+
+    filteredValues.text = text; // Add the rich text content to the values
+
     push(ref(db, databasePath), filteredValues)
       .then(() => {
         setImage(null);
         setValues(initialFieldValues);
+        setText('');
       })
       .catch((error) => {
         console.error("Error uploading data:", error);
@@ -145,7 +163,7 @@ function UploadForm({ fields, databasePath }) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col space-y-2 p-4">
       {fields.map((field, index) => (
-        <div key={index} className="flex items-center h-12">
+        <div key={index} className="flex flex-col"> {/* Wrap each field in a flex column */}
           <label htmlFor={field.name} className="w-14 text-right mr-4">{field.name}</label>
           {field.name === 'imageThumbnail' ? (
             <input id={field.name} name={field.name} type="file" onChange={handleChange} className="w-3/4 border rounded px-2" />
@@ -155,14 +173,25 @@ function UploadForm({ fields, databasePath }) {
                 <option key={index} value={type}>{type}</option>
               ))}
             </select>
+          ) : field.name === 'text' ? (
+            <div className="w-3/4 border rounded px-2" style={{ minHeight: '100px', height: 'auto' }}>
+              <ReactQuill ref={quillRef} value={text} onChange={handleTextChange} onResize={handleQuillResize} />
+            </div>
           ) : (
             <input id={field.name} name={field.name} type={field.type} value={values[field.name]} onChange={handleChange} className="w-3/4 border rounded px-2" />
           )}
         </div>
       ))}
-      <button type="submit" className="self-end mt-4 px-4 py-2 border-2 border-black text-black ">Submit</button>
+      <button type="submit" className="self-end mt-4 px-4 py-2 border-2 border-black text-black">Submit</button>
     </form>
   );
 }
 
 export default UploadForm;
+
+// I need to be able to upload rich text in the Text field in the writing upload form:
+// use react-quill for this. It is a rich text editor. 
+// be VERY mindful of the styling of the rich text editor. Its a FUCKING NIGHTMARE, and needs special divs and stuff
+// to contain its overflow and shit. It really just does not care at all. You must make it submit to your will!
+// I mean it. Create 2, 3, 4 divs to contain it. It musnt overflow!! It HAS to displace the other inputfields vertically!
+// Like, tell me you understand before commencing:

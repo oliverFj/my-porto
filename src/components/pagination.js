@@ -16,8 +16,8 @@ const Pagination = ({ activePage, itemsCountPerPage, totalItemsCount, onChange }
     for (let i = 1; i <= totalPages; i++) {
       const isActive = i === activePage;
       const buttonClasses = isActive
-        ? 'bg-gray-200 text-gray-700 px-4 border-l-2 border-black'
-        : ' text-gray-700 hover:bg-gray-300 px-4 border-l-2 border-black px-4';
+        ? 'bg-gray-200  text-black px-4 border-l-2 border-black'
+        : '  text-black hover:bg-gray-300 px-4 border-l-2 border-black px-4';
 
       pageButtons.push(
         <button
