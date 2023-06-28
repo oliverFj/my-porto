@@ -4,7 +4,7 @@ import { getDatabase, ref, onValue } from 'firebase/database';
 import { app } from '../firebase'; // adjust the import path as needed
 import Layout from '../layout';
 
-const ItemPage = ({ dbRef, renderSidebar, renderMain }) => {
+const ItemPage = ({ dbRef, renderSidebar = () => null, renderMain }) => {
   const { id } = useParams(); // Get the item ID from the URL
   const [item, setItem] = useState(null);
 
@@ -79,22 +79,21 @@ export const ArtItemPage = () => {
 };
 
 export const BlogItemPage = () => {
-    const dbRef = 'Writings'; // Reference to the 'Blog' node in your Firebase database
-    const [loading, setLoading] = useState(true);
-  
-    const renderSidebar = (item) => (
-      <div>
-        {/* your sidebar rendering code here */}
-      </div>
-    );
-  
-    const renderMain = (item) => (
+  const dbRef = 'Writings'; // Reference to the 'Blog' node in your Firebase database
+  const [loading, setLoading] = useState(true);
+
+  const renderMain = (item) => {
+
+    const iframeSrc = `https://docs.google.com/viewer?url=${encodeURIComponent(item.text)}&embedded=true&chrome=true`;
+
+    return (
       <div className="flex justify-center items-center h-full">
         {loading && 
           <div className="absolute">Loading PDF...</div>
         }
         <iframe
-          src={`https://docs.google.com/viewer?url=${encodeURIComponent(item.text)}&embedded=true`}
+          key={iframeSrc} // Assign a key based on the src
+          src={iframeSrc}
           style={{ width: '100%', height: '600px', visibility: loading ? 'hidden' : 'visible' }}
           frameborder="0"
           onLoad={() => setLoading(false)}
@@ -102,12 +101,12 @@ export const BlogItemPage = () => {
         ></iframe>
       </div>
     );
-  
-    return (
-      <ItemPage
-        dbRef={dbRef}
-        renderSidebar={renderSidebar}
-        renderMain={renderMain}
-      />
-    );
   };
+
+  return (
+    <ItemPage
+      dbRef={dbRef}
+      renderMain={renderMain}
+    />
+  );
+};

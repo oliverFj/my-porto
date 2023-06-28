@@ -1,4 +1,11 @@
 // GenericGallery.js
+// This component is a wrapper around GalleryGrid.js that handles the database connection and pagination.
+// It also handles the sidebar menu. The sidebar menu is a list of buttons that filter the items by type.
+// The sidebar menu is not part of the GalleryGrid.js component because it is not a part of the grid.
+// The sidebar menu is a separate component that is passed to the Layout component as a prop.
+// The Layout component is a wrapper around the GalleryGrid.js component.
+
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getDatabase, ref, onValue } from 'firebase/database';

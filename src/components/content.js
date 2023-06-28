@@ -1,8 +1,9 @@
 import React from 'react';
 
-function Content({ children }) {
+function Content({ children, hasSidebar }) {
+  const widthClass = hasSidebar ? 'w-2/3' : 'w-full';
   return (
-    <main className="w-2/3">
+    <main className={widthClass}>
       {children}
     </main>
   );
