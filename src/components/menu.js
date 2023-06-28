@@ -5,7 +5,7 @@ function Menu({ items }) {
   return (
     <div className="flex flex-col space-y-0">
       {items.map((item, index) => (
-        <Link key={index} to={item.link} className="block hover:bg-gray-200">
+        <Link key={index} to={item.link} className="block  hover:bg-gray-200 transition-bg duration-500 ease-in-out">
           <div className="flex items-center h-12 text-center border-b-2 border-black text-black font-bold px-2 cursor-pointer">
             {item.label}
           </div>

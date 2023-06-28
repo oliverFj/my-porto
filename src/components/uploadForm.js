@@ -59,19 +59,17 @@ Med andre ord: Firebase-konfigurationen skal være korrekt opsat i din Firebase-
 
 */
 
-import React, { useState, useEffect, useRef } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import React, { useState, useEffect } from 'react';
 import { getDatabase, ref, push } from "firebase/database";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { app } from '../firebase'; // <- Import your Firebase app from where it's configured
+import { app } from '../firebase';
 
 function UploadForm({ fields, databasePath }) {
   const initialFieldValues = fields.reduce((obj, item) => ({ ...obj, [item.name]: '' }), {});
   const [values, setValues] = useState(initialFieldValues);
   const [image, setImage] = useState(null);
-  const [text, setText] = useState('');
-  const quillRef = useRef(null);
+  const [pdf, setPdf] = useState(null);
+  const [pdfKey, setPdfKey] = useState(Math.random().toString(36)); // Add this line
 
   const ART_TYPES = ["3d Character", "Product design", "Art"];
   const WRITING_TYPES = ["Blog", "Poems", "Essays"];
@@ -83,6 +81,8 @@ function UploadForm({ fields, databasePath }) {
   const handleChange = (e) => {
     if (e.target.name === 'imageThumbnail') {
       setImage(e.target.files[0]);
+    } else if (e.target.name === 'text') {
+      setPdf(e.target.files[0]);
     } else {
       setValues({
         ...values,
@@ -91,23 +91,11 @@ function UploadForm({ fields, databasePath }) {
     }
   };
 
-  const handleTextChange = (value) => {
-    setText(value);
-  };
-
-  const handleQuillResize = () => {
-    const editor = quillRef.current.getEditor();
-    const editorHeight = editor.root.offsetHeight;
-    const container = quillRef.current.container.parentNode;
-    container.style.height = `${editorHeight}px`;
-
-  };
-
-  const uploadImage = async () => {
-    if (!image) return null;
+  const uploadFile = async (file, path) => {
+    if (!file) return null;
     const storage = getStorage(app);
-    const storageReference = storageRef(storage, `images/${image.name}`);
-    const uploadTask = uploadBytesResumable(storageReference, image);
+    const storageReference = storageRef(storage, `${path}/${file.name}`);
+    const uploadTask = uploadBytesResumable(storageReference, file);
 
     return new Promise((resolve, reject) => {
       uploadTask.on(
@@ -130,7 +118,9 @@ function UploadForm({ fields, databasePath }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const db = getDatabase(app);
-    const imageUrl = await uploadImage();
+    const imageUrl = await uploadFile(image, 'images');
+    const pdfUrl = await uploadFile(pdf, 'pdfs');
+
     const filteredValues = Object.keys(values).reduce((obj, key) => {
       if (values[key] !== '') {
         obj[key] = values[key];
@@ -142,19 +132,22 @@ function UploadForm({ fields, databasePath }) {
       filteredValues.imageThumbnail = imageUrl;
     }
 
+    if (pdfUrl) {
+      filteredValues.text = pdfUrl;
+    }
+
     if (databasePath.includes('Art')) {
       filteredValues.type = values.type || ART_TYPES[0];
     } else {
       filteredValues.type = values.type || WRITING_TYPES[0];
     }
 
-    filteredValues.text = text; // Add the rich text content to the values
-
     push(ref(db, databasePath), filteredValues)
       .then(() => {
         setImage(null);
+        setPdf(null);
         setValues(initialFieldValues);
-        setText('');
+        setPdfKey(Math.random().toString(36)); // Add this line
       })
       .catch((error) => {
         console.error("Error uploading data:", error);
@@ -164,7 +157,7 @@ function UploadForm({ fields, databasePath }) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col space-y-2 p-4">
       {fields.map((field, index) => (
-        <div key={index} className="flex flex-col"> {/* Wrap each field in a flex column */}
+        <div key={index} className="flex flex-col">
           <label htmlFor={field.name} className="w-14 text-left mr-4">{field.name}</label>
           {field.name === 'imageThumbnail' ? (
             <input id={field.name} name={field.name} type="file" onChange={handleChange} className="w-3/4 border rounded px-2" />
@@ -175,9 +168,7 @@ function UploadForm({ fields, databasePath }) {
               ))}
             </select>
           ) : field.name === 'text' ? (
-            <div className="w-3/4 border rounded px-2" style={{  height: 'auto' }}>
-              <ReactQuill ref={quillRef} value={text} onChange={handleTextChange} onResize={handleQuillResize} />
-            </div>
+            <input id={field.name} name={field.name} type="file" accept="application/pdf" onChange={handleChange} className="w-3/4 border rounded px-2" key={pdfKey} /> // Add key prop here
           ) : (
             <input id={field.name} name={field.name} type={field.type} value={values[field.name]} onChange={handleChange} className="w-3/4 border rounded px-2" />
           )}

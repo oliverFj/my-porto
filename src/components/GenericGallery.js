@@ -70,7 +70,7 @@ const GenericGallery = ({ dbRef, CardComponent, headline, tabOptions, itemsCount
         {tabOptions.map((tab) => (
           <button
             key={tab}
-            className={`w-full hover:bg-gray-200 flex items-center h-12 !important border-b-2 border-black text-black font-bold px-2 cursor-pointer ${activeTab === tab ? 'active' : ''}`}
+            className={`w-full  hover:bg-gray-200 transition-bg duration-500 ease-in-out flex items-center h-12 !important border-b-2 border-black text-black font-bold px-2 cursor-pointer ${activeTab === tab ? 'active' : ''}`}
             onClick={() => {
               setActiveTab(tab);
               navigate(`?tab=${tab}&page=${activePage}`);
