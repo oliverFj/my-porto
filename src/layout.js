@@ -25,11 +25,11 @@ function Layout({ headline, sidebar, main, children }) {
   const hasSidebar = Boolean(sidebar);
   return (
     <div className="flex items-center min-h-screen justify-center">
-      <div className="w-[1000px] h-[750px] flex flex-col border-black">
+      <div className="w-full md:w-[1000px] h-[750px] flex flex-col border-black">
         <Header>
-          <h1 className="text-black text-xl text-left font-bold px-2">{headline}</h1>
+          <h1 className="text-lg text-left font-bold ">{headline}</h1>
         </Header>
-        <div className="flex flex-row flex-grow border-l-2 border-r-2 border-black">
+        <div className="flex flex-col md:flex-row flex-1 border-l-2 border-r-2 border-black">
           {hasSidebar && <Sidebar>{sidebar}</Sidebar>}
           <Content hasSidebar={hasSidebar}>{main}</Content>
         </div>
