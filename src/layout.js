@@ -27,9 +27,10 @@ function Layout({ headline, sidebar, main, children }) {
     <div className="flex items-center min-h-screen justify-center">
       <div className="w-full md:w-[1000px] h-[750px] flex flex-col border-black">
         <Header>
-          <h1 className="text-lg text-left font-bold ">{headline}</h1>
+          <h1 className="text-lg text-left font-bold">{headline}</h1>
         </Header>
-        <div className="flex flex-col md:flex-row flex-1 border-l-2 border-r-2 border-black">
+        
+        <div className="flex flex-col md:flex-row md:max-h-[calc(750px-150px)] flex-1 border-l-2 border-r-2 border-black">
           {hasSidebar && <Sidebar>{sidebar}</Sidebar>}
           <Content hasSidebar={hasSidebar}>{main}</Content>
         </div>
