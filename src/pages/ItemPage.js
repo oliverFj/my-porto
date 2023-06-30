@@ -4,6 +4,8 @@ import { getDatabase, ref, onValue } from 'firebase/database';
 import { app } from '../firebase'; // adjust the import path as needed
 import Layout from '../layout';
 
+
+
 const ItemPage = ({ dbRef, renderSidebar = () => null, renderMain }) => {
   const { id } = useParams(); // Get the item ID from the URL
   const [item, setItem] = useState(null);
@@ -81,22 +83,43 @@ export const ArtItemPage = () => {
 export const BlogItemPage = () => {
   const dbRef = 'Writings'; // Reference to the 'Blog' node in your Firebase database
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   const renderMain = (item) => {
-
     const iframeSrc = `https://docs.google.com/viewer?url=${encodeURIComponent(item.text)}&embedded=true&chrome=true`;
 
+    const handleLoad = () => {
+      setLoading(false);
+      setRetryCount(0); // Reset retry count on successful load
+    };
+
+    const handleError = (e) => {
+      setLoading(false);
+      setError(`Error loading PDF: ${e.target.error}`);
+      if (retryCount < 3) { // Limit the number of retries to prevent infinite loop
+        setTimeout(() => {
+          setRetryCount(retryCount + 1); // Increment retry count
+          setLoading(true); // Trigger a re-render to attempt to load the PDF again
+        }, 3000); // Wait 3 seconds before retrying
+      }
+    };
+
     return (
-      <div className="flex justify-center items-center h-full">
+      <div className="flex justify-center items-center h-full relative">
         {loading && 
           <div className="absolute">Loading PDF...</div>
         }
+        {error && 
+          <div className="absolute">{error}</div>
+        }
         <iframe
-          key={iframeSrc} // Assign a key based on the src
+          key={`${iframeSrc}-${retryCount}`} // Change key to force re-render of iframe
           src={iframeSrc}
-          style={{ width: '100%', height: '600px', visibility: loading ? 'hidden' : 'visible' }}
+          style={{ width: '100%', height: '600px' }}
           frameborder="0"
-          onLoad={() => setLoading(false)}
+          onLoad={handleLoad}
+          onError={handleError}
           className="w-full h-full"
         ></iframe>
       </div>
@@ -110,3 +133,7 @@ export const BlogItemPage = () => {
     />
   );
 };
+
+
+// here is a link to a PDF i get from the firebase storage:
+// https://firebasestorage.googleapis.com/v0/b/portfolio-fd480.appspot.com/o/pdfs%2FAI%20historie.pdf?alt=media&token=270c4110-5542-4eb9-a74f-f929d6f77f0a
