@@ -8,10 +8,10 @@ const Home = () => {
     const sidebar = (
         <Menu
             items={[
-                { label: 'Design and art', link: '/gallery' },
+                { label: 'Design and art', link: '/gallery?tab=All&page=1' },
                 { label: 'Blog and writings', link: '/blog' },
                 { label: 'About Me', link: '/about' },
-                { label: 'Upload', link: '/upload' },
+              //{ label: 'Upload', link: '/upload' },
                 // Add more menu items as needed
             ]}
         />

@@ -18,10 +18,29 @@ function UploadForm({ fields, databasePath }) {
   }, [fields]);
 
   const handleChange = (e) => {
-    if (e.target.name === 'imageThumbnail') {
-      setImage(e.target.files[0]);
-    } else if (e.target.name === 'text') {
-      setPdf(e.target.files[0]);
+    if (e.target.name === 'imageThumbnail' || e.target.name === 'text') {
+      const file = e.target.files[0];
+
+      // Check if the file is an image or a PDF file
+      if (e.target.name === 'imageThumbnail' && !file.type.startsWith('image/')) {
+        alert('The file must be an image.');
+        return;
+      } else if (e.target.name === 'text' && file.type !== 'application/pdf') {
+        alert('The file must be a PDF.');
+        return;
+      }
+
+      const fileSize = file.size / 1024 / 1024; // size in MB (1 MB = 1024 * 1024 bytes) 
+      const maxSize = 20; // maximum size in MB (1 MB = 1024 * 1024 bytes) therefore 
+      if (fileSize > maxSize) {
+        alert(`The file must be less than ${maxSize} MB.`);
+        return;
+      }
+      if (e.target.name === 'imageThumbnail') {
+        setImage(file);
+      } else {
+        setPdf(file);
+      }
     } else {
       setValues({
         ...values,

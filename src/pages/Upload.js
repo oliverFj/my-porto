@@ -12,11 +12,26 @@
 
 //Skriv nogle pædagogiske kommentarer til denne kode:
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Layout from '../layout'; 
 import UploadForm from '../components/uploadForm'; 
 
 const Upload = () => {
+  const PASSWORD = "123ThePassword"; // Set your password here
+
+  const [password, setPassword] = useState("");
+  const [authenticated, setAuthenticated] = useState(false);
+
+  const handlePasswordSubmit = (event) => {
+    event.preventDefault();
+    if (password === PASSWORD) {
+      setAuthenticated(true);
+    } else {
+      alert("Incorrect password");
+    }
+  };
+
+
   const ART_FIELDS = [
     {name: 'description', type: 'text'},
     {name: 'imageThumbnail', type: 'text'},
@@ -59,9 +74,25 @@ const Upload = () => {
 
   const main = <UploadForm fields={fields} databasePath={databasePath} />;
 
-  return (
-    <Layout headline="Upload" sidebar={sidebar} main={main} />
-  );
+  if (!authenticated) {
+    return (
+      <div>
+        <form onSubmit={handlePasswordSubmit}>
+          <input 
+            type="password" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            placeholder="Enter password"
+          />
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    );
+  } else {
+    return (
+      <Layout headline="Upload" sidebar={sidebar} main={main} />
+    );
+  }
 };
 
 export default Upload;

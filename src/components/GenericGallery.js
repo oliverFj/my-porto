@@ -80,7 +80,8 @@ const GenericGallery = ({ dbRef, CardComponent, headline, tabOptions, itemsCount
             className={`w-full  hover:bg-gray-200 transition-bg duration-500 ease-in-out flex items-center h-12 !important border-b-2 border-black text-black font-bold px-2 cursor-pointer ${activeTab === tab ? 'active' : ''}`}
             onClick={() => {
               setActiveTab(tab);
-              navigate(`?tab=${tab}&page=${activePage}`);
+              setActivePage(1); // Reset the page number to 1
+              navigate(`?tab=${tab}&page=1`); // Always navigate to page 1
             }}
           >
             {tab}
