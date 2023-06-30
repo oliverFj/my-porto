@@ -1,66 +1,5 @@
-/**
-Komponenten UploadForm
-
-Dette er en formular-komponent, der håndterer upload af data til en Firebase-database og -lagring.
-Denne komponent er designet til at blive brugt i en React-app, der er konfigureret med Firebase.
-
-@param {Object} props
-@param {Array} props.fields - Et array af objekter, der repræsenterer felterne i formularen. Hvert objekt skal have et 'name' og 'type'.
-@param {String} props.databasePath - En streng, der repræsenterer stien i Firebase-databasen, hvor dataene vil blive gemt.
-
-Du skal ændre:
-
-fields: Opdater dette for at afspejle de felter, din formular skal indeholde. Hvert feltsobjekt skal have et 'name' og 'type'.
-databasePath: Dette skal pege på placeringen i din Firebase-database, hvor du vil gemme formulardataene.
-
-Import af app: Du skal importere konfigurationen for din Firebase-app fra det sted, hvor den er defineret i dit projekt.
-Firebase-konfigurationen for både database og lagring skal være korrekt opsat i din Firebase-konsol.
-
-
-------------------
-Denne kode definerer en React-komponent kaldet UploadForm, der håndterer upload af data til en Firebase-database og -lagring.
-
-Komponenten modtager to props: fields og databasePath. fields er et array af objekter, der repræsenterer felterne i formularen, og databasePath er stien i Firebase-databasen, hvor dataene vil blive gemt.
-
-fields og databasePath skal tilpasses i forhold til de specifikke felter og sti i den aktuelle Firebase-konfiguration.
-
-Firebase-appen skal importeres fra det relevante sted i projektet og tildeles variablen app. Dette sikrer, at den korrekte Firebase-konfiguration bruges.
-
-Komponenten bruger React Hooks som useState og useEffect til at håndtere formularværdier og livscyklushændelser.
-
-handleChange-funktionen opdaterer værdierne baseret på brugerens input. Hvis input er en billedfil, gemmes filen separat i image-tilstanden.
-
-uploadImage-funktionen håndterer upload af billedet til Firebase Storage og returnerer en Promise, der resulterer i billedets download-URL.
-
-handleSubmit-funktionen håndterer indsendelsen af formularen. Den uploader først billedet ved hjælp af uploadImage-funktionen og opdaterer derefter formularværdierne og den filtrerede værdi, der skal gemmes i Firebase-databasen. Til sidst nulstilles formularværdierne.
-
-Komponenten genererer HTML-formularelementer baseret på fields-prop. Det støtter inputfelter, filindtastning og dropdown-menuer afhængigt af felterne i fields.
-
-Når formularen indsendes, kaldes handleSubmit-funktionen, og dataene sendes til Firebase-databasen ved hjælp af push-metoden fra Firebase Realtime Database SDK.
-------------------
-
-De to vigtigste ting ved denne fil er:
-
-Dataupload til Firebase: Filen indeholder implementeringen af en formularkomponent, 
-der håndterer upload af data til en Firebase-database og -lagring. 
-Dette er en afgørende funktionalitet for applikationer, der ønsker at gemme 
-brugerindtastede data i en Firebase-database og håndtere upload af billeder 
-eller andre filer til Firebase Storage.
-
-Med andre ord: upload af data til Firebase-databasen og -lagringen.
-
-Firebase-konfiguration: Filen kræver, at Firebase-appens konfiguration importeres
-fra et andet sted i projektet og tildeles variablen app. Dette sikrer, at den 
-korrekte Firebase-konfiguration bruges til at oprette forbindelse til Firebase-databasen
-og -lagringen. En korrekt konfiguration af Firebase er afgørende for at kunne foretage
-dataupload og -lagring korrekt.
-
-Med andre ord: Firebase-konfigurationen skal være korrekt opsat i din Firebase-konsol.
-
-*/
-
 import React, { useState, useEffect } from 'react';
-import { getDatabase, ref, push } from "firebase/database";
+import { getDatabase, ref, push, get } from "firebase/database"; // Import get
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { app } from '../firebase';
 
@@ -69,7 +8,7 @@ function UploadForm({ fields, databasePath }) {
   const [values, setValues] = useState(initialFieldValues);
   const [image, setImage] = useState(null);
   const [pdf, setPdf] = useState(null);
-  const [pdfKey, setPdfKey] = useState(Math.random().toString(36)); // Add this line
+  const [pdfKey, setPdfKey] = useState(Math.random().toString(36));
 
   const ART_TYPES = ["3d Character", "Product design", "Art"];
   const WRITING_TYPES = ["Blog", "Poems", "Essays"];
@@ -79,10 +18,29 @@ function UploadForm({ fields, databasePath }) {
   }, [fields]);
 
   const handleChange = (e) => {
-    if (e.target.name === 'imageThumbnail') {
-      setImage(e.target.files[0]);
-    } else if (e.target.name === 'text') {
-      setPdf(e.target.files[0]);
+    if (e.target.name === 'imageThumbnail' || e.target.name === 'text') {
+      const file = e.target.files[0];
+
+      // Check if the file is an image or a PDF file
+      if (e.target.name === 'imageThumbnail' && !file.type.startsWith('image/')) {
+        alert('The file must be an image.');
+        return;
+      } else if (e.target.name === 'text' && file.type !== 'application/pdf') {
+        alert('The file must be a PDF.');
+        return;
+      }
+
+      const fileSize = file.size / 1024 / 1024; // size in MB (1 MB = 1024 * 1024 bytes) 
+      const maxSize = 20; // maximum size in MB (1 MB = 1024 * 1024 bytes) therefore 
+      if (fileSize > maxSize) {
+        alert(`The file must be less than ${maxSize} MB.`);
+        return;
+      }
+      if (e.target.name === 'imageThumbnail') {
+        setImage(file);
+      } else {
+        setPdf(file);
+      }
     } else {
       setValues({
         ...values,
@@ -118,6 +76,12 @@ function UploadForm({ fields, databasePath }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const db = getDatabase(app);
+    const dbRef = ref(db, databasePath); // Get a reference to the database path
+  
+    let indexNumber = 0;
+    const snapshot = await get(dbRef); // Use get instead of once
+    indexNumber = snapshot.size; // Use size instead of numChildren
+
     const imageUrl = await uploadFile(image, 'images');
     const pdfUrl = await uploadFile(pdf, 'pdfs');
 
@@ -142,12 +106,15 @@ function UploadForm({ fields, databasePath }) {
       filteredValues.type = values.type || WRITING_TYPES[0];
     }
 
-    push(ref(db, databasePath), filteredValues)
-      .then(() => {
+
+    filteredValues.indexNumber = indexNumber + 1;
+
+    push(dbRef, filteredValues)
+    .then(() => {
         setImage(null);
         setPdf(null);
         setValues(initialFieldValues);
-        setPdfKey(Math.random().toString(36)); // Add this line
+        setPdfKey(Math.random().toString(36));
       })
       .catch((error) => {
         console.error("Error uploading data:", error);
@@ -168,7 +135,7 @@ function UploadForm({ fields, databasePath }) {
               ))}
             </select>
           ) : field.name === 'text' ? (
-            <input id={field.name} name={field.name} type="file" accept="application/pdf" onChange={handleChange} className="w-3/4 border rounded px-2" key={pdfKey} /> // Add key prop here
+            <input id={field.name} name={field.name} type="file" accept="application/pdf" onChange={handleChange} className="w-3/4 border rounded px-2" key={pdfKey} />
           ) : (
             <input id={field.name} name={field.name} type={field.type} value={values[field.name]} onChange={handleChange} className="w-3/4 border rounded px-2" />
           )}
@@ -181,9 +148,35 @@ function UploadForm({ fields, databasePath }) {
 
 export default UploadForm;
 
-// I need to be able to upload rich text in the Text field in the writing upload form:
-// use react-quill for this. It is a rich text editor. 
-// be VERY mindful of the styling of the rich text editor. Its a FUCKING NIGHTMARE, and needs special divs and stuff
-// to contain its overflow and shit. It really just does not care at all. You must make it submit to your will!
-// I mean it. Create 2, 3, 4 divs to contain it. It musnt overflow!! It HAS to displace the other inputfields vertically!
-// Like, tell me you understand before commencing:
+/*
+This code defines a React component named UploadForm that provides a form for users to upload files
+and other data to a Firebase database and storage. Here are the three main points that summarize what this code does:
+
+Form State Management: The UploadForm component uses React's useState and useEffect hooks to manage 
+the state of the form. The useState hook is used to create state variables for the form fields (values),
+the image file to be uploaded (image), the PDF file to be uploaded (pdf), and a key for the PDF file (pdfKey). 
+The useEffect hook is used to reset the form fields whenever the fields prop changes. 
+The handleChange function is used to update the state variables when the user interacts with the form.
+
+File Upload: The uploadFile function is used to upload a file to Firebase storage. It creates a reference to a location in Firebase
+ storage, starts a resumable upload, and returns a promise that resolves with the download URL of the uploaded file. 
+ This function is used in the handleSubmit function to upload the image and PDF files when the form is submitted.
+
+Form Submission: The handleSubmit function is triggered when the form is submitted. It prevents the default form submission behavior,
+gets a reference to a location in the Firebase database, calculates the index number for the new item, uploads the image and PDF
+files, filters the form values, sets the type of the item based on the databasePath, adds the index number to the new item, 
+and pushes the new item to the Firebase database. If the upload is successful, it resets the form and the state variables; if not, it logs the error.
+
+The code needs the following from external sources:
+
+- React, useState, and useEffect from the react library for creating the React component and managing state.
+
+- Various functions from the firebase/database and firebase/storage libraries for interacting with Firebase.
+
+- The app object from the ../firebase module, which represents the Firebase app.
+
+- The fields and databasePath props, which are passed to the UploadForm component when it is used. The fields 
+  prop is an array of objects that define the fields of the form, and the databasePath prop is a string that 
+  specifies the path in the Firebase database where the new item should be stored.
+
+*/

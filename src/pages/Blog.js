@@ -1,6 +1,5 @@
 // pages/Blog.js
 import React from 'react';
-import Layout from '../layout';
 import GenericGallery from '../components/GenericGallery';
 import TextCard from '../components/TextCard';
 
@@ -11,19 +10,17 @@ const Blog = () => {
   const tabOptions = ['All', 'Category1', 'Category2', 'Category3'];
   const itemsCountPerPage = 6;
 
-  const sidebar = <p>This is the sidebar content for the Blog page.</p>;
+  // Removed the sidebar prop
 
   return (
-
-        <GenericGallery
-          dbRef={dbRef}
-          CardComponent={CardComponent}
-          headline={headline}
-          tabOptions={tabOptions}
-          itemsCountPerPage={itemsCountPerPage}
-        />
-      
-    
+    <GenericGallery
+      dbRef={dbRef}
+      CardComponent={CardComponent}
+      headline={headline}
+      tabOptions={tabOptions}
+      itemsCountPerPage={itemsCountPerPage}
+      showSidebar={false} // This will hide the sidebar
+    />
   );
 };
 
