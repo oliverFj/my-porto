@@ -44,7 +44,8 @@ const Upload = () => {
   const WRITING_FIELDS = [
     {name: 'text', type: 'text'},
     {name: 'title', type: 'text'},
-    {name: 'type', type: 'text'}
+    {name: 'type', type: 'text'},
+    {name: 'Intro', type: 'text'}, // Add this line
   ];
 
   const menuItems = [

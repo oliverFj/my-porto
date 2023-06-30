@@ -78,8 +78,6 @@ function UploadForm({ fields, databasePath }) {
     const db = getDatabase(app);
     const dbRef = ref(db, databasePath); // Get a reference to the database path
   
-    // Get the current number of items in the database
-    // This will be used to determine the indexNumber of the new item
     let indexNumber = 0;
     const snapshot = await get(dbRef); // Use get instead of once
     indexNumber = snapshot.size; // Use size instead of numChildren
@@ -108,8 +106,7 @@ function UploadForm({ fields, databasePath }) {
       filteredValues.type = values.type || WRITING_TYPES[0];
     }
 
-    // Add the indexNumber to the new item
-    // This will be used to sort the items in the database
+
     filteredValues.indexNumber = indexNumber + 1;
 
     push(dbRef, filteredValues)

@@ -13,7 +13,7 @@ import { app } from '../firebase'; // adjust the import path as needed
 import Layout from '../layout';
 import GalleryGrid from './galleryGrid';
 
-const GenericGallery = ({ dbRef, CardComponent, headline, tabOptions, itemsCountPerPage }) => {
+const GenericGallery = ({ dbRef, CardComponent, headline, tabOptions, itemsCountPerPage, showSidebar = true }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -71,7 +71,7 @@ const GenericGallery = ({ dbRef, CardComponent, headline, tabOptions, itemsCount
     navigate(`?tab=${activeTab}&page=${pageNumber}`);
   };
 
-  const sidebar = (
+  const sidebar = showSidebar ? (
     <div className="w-full">
       <div className="menu">
         {tabOptions.map((tab) => (
@@ -89,7 +89,7 @@ const GenericGallery = ({ dbRef, CardComponent, headline, tabOptions, itemsCount
         ))}
       </div>
     </div>
-  );
+  ) : null;
 
   return (
     <Layout
