@@ -17,6 +17,7 @@ const GenericGallery = ({ dbRef, CardComponent, headline, tabOptions, itemsCount
   const navigate = useNavigate();
   const location = useLocation();
 
+
   const [items, setItems] = useState([]);
   const [activePage, setActivePage] = useState(1);
   const [totalItemsCount, setTotalItemsCount] = useState(0);
@@ -26,15 +27,15 @@ const GenericGallery = ({ dbRef, CardComponent, headline, tabOptions, itemsCount
     const queryParams = new URLSearchParams(location.search);
     const tab = queryParams.get('tab');
     const page = queryParams.get('page');
-
-    if (tab) {
+  
+    if (tab !== null) {
       setActiveTab(tab);
     }
-
-    if (page) {
+  
+    if (page !== null) {
       setActivePage(Number(page));
     }
-  }, []);
+  }, [location]); // Add location as a dependency
 
   const fetchItems = () => {
     const db = getDatabase(app);
@@ -62,9 +63,9 @@ const GenericGallery = ({ dbRef, CardComponent, headline, tabOptions, itemsCount
     });
   };
 
-  useEffect(() => {
-    fetchItems();
-  }, [activeTab]);
+useEffect(() => {
+  fetchItems();
+}, [activeTab, activePage]); // Add activePage as a dependency
 
   const handlePageChange = (pageNumber) => {
     setActivePage(pageNumber);
