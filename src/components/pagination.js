@@ -40,7 +40,8 @@ const Pagination = ({ activePage, itemsCountPerPage, totalItemsCount, onChange }
           className="bg-white text-black  hover:bg-gray-300 border-l-2 border-black px-4 "
           onClick={() => handlePageChange(activePage - 1)}
         >
-          Previous
+
+          &#x21FD;
         </button>
       );
     }
@@ -50,11 +51,15 @@ const Pagination = ({ activePage, itemsCountPerPage, totalItemsCount, onChange }
   const renderNextButton = () => {
     if (activePage < totalPages) {
       return (
-        <button
-          className=" text-black hover:bg-gray-300 border-l-2 border-black px-4  "
+        <button 
+          className="text-black hover:bg-gray-300 border-l-2 border-black px-4  "
           onClick={() => handlePageChange(activePage + 1)}
         >
-          Next
+
+
+
+
+          &#x21FE;
         </button>
       );
     }
@@ -78,3 +83,6 @@ Pagination.propTypes = {
 };
 
 export default Pagination;
+
+          //junior: what other unicode symbols can we use here?
+          //senior: https://www.w3schools.com/charsets/ref_utf_arrows.asp

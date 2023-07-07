@@ -25,7 +25,7 @@ function Layout({ headline, sidebar, main, children }) {
   const hasSidebar = Boolean(sidebar);
   return (
     <div className="flex items-center min-h-screen justify-center">
-      <div className="w-full md:w-[1000px] h-[750px] flex flex-col border-black">
+      <div className="w-full md:w-[1000px] h-[750px] flex flex-col m-4 border-black">
         <Header>
           <h1 className="text-lg text-left font-bold">{headline}</h1>
         </Header>

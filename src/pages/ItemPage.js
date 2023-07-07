@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { getDatabase, ref, onValue } from 'firebase/database';
 import { app } from '../firebase'; // adjust the import path as needed
@@ -65,11 +65,35 @@ export const ArtItemPage = () => {
     </div>
   );
 
-  const renderMain = (item) => (
-    <div>
+  const renderMain = (item) => {
+    // Parse the HTML string into a DOM
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(item.link, 'text/html');
+  
+    // Get the iframe from the DOM
+    const iframe = doc.querySelector('iframe');
+    if (iframe) {
+      // Add the necessary styles to the iframe
+      iframe.classList.add('absolute', 'inset-0', 'w-full', 'h-full');
+  
+      // Wrap the iframe in a div with the necessary styles
+      const wrapper = doc.createElement('div');
+      wrapper.classList.add('relative', 'w-full', 'h-[600px]');
+      wrapper.appendChild(iframe.cloneNode(true)); // Clone the iframe to avoid modifying the original DOM
+  
+      // Serialize the wrapper back to an HTML string
+      const wrapperHtml = wrapper.outerHTML;
+  
+      return (
+        <div dangerouslySetInnerHTML={{ __html: wrapperHtml }}></div>
+      );
+    }
+  
+    // If there's no iframe in the HTML string, just return the original HTML string
+    return (
       <div dangerouslySetInnerHTML={{ __html: item.link }}></div>
-    </div>
-  );
+    );
+  };
 
   return (
     <ItemPage
@@ -85,24 +109,35 @@ export const BlogItemPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [retryCount, setRetryCount] = useState(0);
+  const loadTimerRef = useRef(null);
+
+  const iframeSrcRef = useRef('');
+
+  const clearLoadTimer = () => {
+    if (loadTimerRef.current) {
+      clearTimeout(loadTimerRef.current);
+      loadTimerRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    clearLoadTimer();
+    return clearLoadTimer; // Clear the timer when the component unmounts
+  }, []);
 
   const renderMain = (item) => {
-    const iframeSrc = `https://docs.google.com/viewer?url=${encodeURIComponent(item.text)}&embedded=true&chrome=true`;
+    iframeSrcRef.current = `https://docs.google.com/viewer?url=${encodeURIComponent(item.text)}&embedded=true&chrome=true`;
 
     const handleLoad = () => {
       setLoading(false);
-      setRetryCount(0); // Reset retry count on successful load
+      setError(null);
+      clearLoadTimer();
     };
 
     const handleError = (e) => {
       setLoading(false);
       setError(`Error loading PDF: ${e.target.error}`);
-      if (retryCount < 3) { // Limit the number of retries to prevent infinite loop
-        setTimeout(() => {
-          setRetryCount(retryCount + 1); // Increment retry count
-          setLoading(true); // Trigger a re-render to attempt to load the PDF again
-        }, 3000); // Wait 3 seconds before retrying
-      }
+      clearLoadTimer();
     };
 
     return (
@@ -114,8 +149,8 @@ export const BlogItemPage = () => {
           <div className="absolute">{error}</div>
         }
         <iframe
-          key={`${iframeSrc}-${retryCount}`} // Change key to force re-render of iframe
-          src={iframeSrc}
+          key={`${iframeSrcRef.current}-${retryCount}`} // Change key to force re-render of iframe
+          src={iframeSrcRef.current}
           style={{ width: '100%', height: '600px' }}
           frameborder="0"
           onLoad={handleLoad}
@@ -126,6 +161,21 @@ export const BlogItemPage = () => {
     );
   };
 
+  useEffect(() => {
+    if (loading) {
+      // If the iframe is still loading after 5 seconds, retry loading
+      loadTimerRef.current = setTimeout(() => {
+        if (retryCount < 3) {
+          setRetryCount(retryCount + 1);
+          setLoading(true);
+        } else {
+          setLoading(false);
+          setError('Error: PDF load timeout');
+        }
+      }, 5000);
+    }
+  }, [loading, retryCount]);
+
   return (
     <ItemPage
       dbRef={dbRef}
@@ -133,7 +183,6 @@ export const BlogItemPage = () => {
     />
   );
 };
-
 
 // here is a link to a PDF i get from the firebase storage:
 // https://firebasestorage.googleapis.com/v0/b/portfolio-fd480.appspot.com/o/pdfs%2FAI%20historie.pdf?alt=media&token=270c4110-5542-4eb9-a74f-f929d6f77f0a

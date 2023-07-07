@@ -35,11 +35,15 @@ const About = () => {
       <p className='text-justify'>On this page you can see some of my work and read some of my thoughts. I have a gallery with examples of 3D art,
         design, and whatever I have had in a format and was in a state of somewhat completion. <br />
         <br />
+      </p>
+      <p className='text-center'>
         I am very good at starting projects.  <br />
         Therefore I know a lot of stuff, <br />
         and can make a lot of different things.<br />
+      </p>
+      <p className='text-justify'>
         <br />
-        I am currently studying for a masters degree in digital design and interactive technology at the danish IT University,
+        I will soon be studying for a masters degree in digital design and interactive technology at the danish IT University,
         and I have a bacelors degree in digital concept development from the Zealand Academy of Technologies and Business.
         <br />
         I have worked with graphics and design for over 10 years, and I have an extensive understanding of modern technology.
